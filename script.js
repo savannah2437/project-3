@@ -187,14 +187,15 @@ function update(year) {
   const labels = g.selectAll("text.bar-label").data(data, (d) => d.plant);
 
   const labelsEnter = labels
-    .enter()
-    .append("text")
-    .attr("class", "bar-label")
-    .attr("x", -10)
-    .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
-    .attr("dy", "0.35em")
-    .attr("text-anchor", "end")
-    .text((d) => d.plant);
+  .enter()
+  .append("text")
+  .attr("class", "bar-label")
+  .attr("x", -12)
+  .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
+  .attr("dy", "0.35em")
+  .attr("text-anchor", "end")
+  .text((d) => d.plant);
+
 
   labelsEnter
     .merge(labels)
