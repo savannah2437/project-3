@@ -194,15 +194,17 @@ function update(year) {
   .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
   .attr("dy", "0.35em")
   .attr("text-anchor", "end")
-  .text((d) => d.plant);
+ .text((d) => `${d.plant} — ${d.subreddit}`);
+
 
 
   labelsEnter
-    .merge(labels)
-    .transition()
-    .duration(900)
-    .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
-    .text((d) => d.plant);
+  .merge(labels)
+  .transition()
+  .duration(900)
+  .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
+  .text((d) => `${d.plant} — ${d.subreddit}`);
+
 
   labels.exit().remove();
 
