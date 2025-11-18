@@ -190,11 +190,12 @@ function update(year) {
   .enter()
   .append("text")
   .attr("class", "bar-label")
-  .attr("x", -12)
+  .attr("x", 4)  // a little bit to the right of the axis
   .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
   .attr("dy", "0.35em")
-  .attr("text-anchor", "end")
- .text((d) => `${d.plant} — ${d.subreddit}`);
+  .attr("text-anchor", "start")  // text goes to the right
+  .text((d) => `${d.plant} — ${d.subreddit}`);
+
 
 
 
@@ -202,8 +203,10 @@ function update(year) {
   .merge(labels)
   .transition()
   .duration(900)
+  .attr("x", 4)
   .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
   .text((d) => `${d.plant} — ${d.subreddit}`);
+
 
 
   labels.exit().remove();
