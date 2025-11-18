@@ -1,6 +1,4 @@
-// ---------------------------------------------
-// DATA: your plants + their "digital offspring"
-// ---------------------------------------------
+
 const rawData = [
   // Tillandsia recurvata — r/ExplainLikeImFive
   { year: 2019, plant: "Tillandsia recurvata", subreddit: "r/ExplainLikeImFive", offspring: 60 },
