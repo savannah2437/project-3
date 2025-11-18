@@ -1,4 +1,5 @@
 
+// DATA: plants + their digital offspring
 const rawData = [
   // Tillandsia recurvata — r/ExplainLikeImFive
   { year: 2019, plant: "Tillandsia recurvata", subreddit: "r/ExplainLikeImFive", offspring: 60 },
@@ -80,3 +81,170 @@ const rawData = [
   { year: 2023, plant: "Esperanza Flowers", subreddit: "r/AmIOverReacting", offspring: 425 },
   { year: 2024, plant: "Esperanza Flowers", subreddit: "r/AmIOverReacting", offspring: 460 },
 ];
+
+
+// CHART SETUP
+
+const margin = { top: 40, right: 40, bottom: 40, left: 170 };
+const width = 900;
+const height = 450;
+
+const svg = d3
+  .select("#chart")
+  .append("svg")
+  .attr("viewBox", [0, 0, width, height]);
+
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+const g = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// scales
+const x = d3.scaleLinear().range([0, innerWidth]);
+const y = d3.scaleBand().range([0, innerHeight]).padding(0.2);
+
+// axes
+const xAxisGroup = g
+  .append("g")
+  .attr("class", "x-axis")
+  .attr("transform", `translate(0,${innerHeight})`);
+
+const yAxisGroup = g.append("g").attr("class", "y-axis");
+
+// x-axis label (metaphor)
+svg
+  .append("text")
+  .attr("x", margin.left + innerWidth / 2)
+  .attr("y", height - 5)
+  .attr("text-anchor", "middle")
+  .attr("font-size", 12)
+  .text("Number of offspring (subreddit members / digital seedlings)");
+
+// "year" label in the corner
+const yearLabel = svg
+  .append("text")
+  .attr("class", "year-label")
+  .attr("x", width - margin.right)
+  .attr("y", margin.top)
+  .attr("text-anchor", "end")
+  .text("");
+
+
+// DATA PREP
+
+const years = Array.from(new Set(rawData.map((d) => d.year))).sort(
+  (a, b) => a - b
+);
+
+// Map: sorted data for that year
+const dataByYear = new Map();
+years.forEach((year) => {
+  const yearSlice = rawData
+    .filter((d) => d.year === year)
+    .sort((a, b) => b.offspring - a.offspring);
+  dataByYear.set(year, yearSlice);
+});
+
+
+// UPDATE FUNCTION (one "frame" of the race)
+
+function update(year) {
+  const data = dataByYear.get(year);
+
+  x.domain([0, d3.max(data, (d) => d.offspring) || 1]);
+  y.domain(data.map((d) => d.plant));
+
+  //BARS 
+  const bars = g.selectAll("rect.bar").data(data, (d) => d.plant);
+
+  const barsEnter = bars
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", 0)
+    .attr("y", (d) => y(d.plant))
+    .attr("height", y.bandwidth())
+    .attr("width", 0);
+
+  barsEnter
+    .merge(bars)
+    .transition()
+    .duration(900)
+    .attr("y", (d) => y(d.plant))
+    .attr("height", y.bandwidth())
+    .attr("width", (d) => x(d.offspring));
+
+  bars
+    .exit()
+    .transition()
+    .duration(500)
+    .attr("width", 0)
+    .remove();
+
+  // PLANT LABELS (left of bar)
+  const labels = g.selectAll("text.bar-label").data(data, (d) => d.plant);
+
+  const labelsEnter = labels
+    .enter()
+    .append("text")
+    .attr("class", "bar-label")
+    .attr("x", -10)
+    .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "end")
+    .text((d) => d.plant);
+
+  labelsEnter
+    .merge(labels)
+    .transition()
+    .duration(900)
+    .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
+    .text((d) => d.plant);
+
+  labels.exit().remove();
+
+  //  VALUE LABELS (inside bar)
+  const values = g.selectAll("text.value-label").data(data, (d) => d.plant);
+
+  const valuesEnter = values
+    .enter()
+    .append("text")
+    .attr("class", "value-label")
+    .attr("x", (d) => x(d.offspring) + 4)
+    .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
+    .attr("dy", "0.35em")
+    .text((d) => d.offspring);
+
+  valuesEnter
+    .merge(values)
+    .transition()
+    .duration(900)
+    .attr("x", (d) =>
+      x(d.offspring) + 4
+    )
+    .attr("y", (d) => y(d.plant) + y.bandwidth() / 2)
+    .text((d) => d.offspring);
+
+  values.exit().remove();
+
+  //  AXES 
+  const xAxis = d3.axisBottom(x).ticks(5);
+  xAxisGroup.transition().duration(900).call(xAxis);
+
+  yAxisGroup.call(d3.axisLeft(y).tickSize(0).tickFormat(""));
+
+  //  YEAR LABEL 
+  yearLabel.text(year);
+}
+
+// ANIMATE THROUGH YEARS (simple race)
+
+let idx = 0;
+update(years[idx]);
+
+setInterval(() => {
+  idx = (idx + 1) % years.length;
+  update(years[idx]);
+}, 1400);
