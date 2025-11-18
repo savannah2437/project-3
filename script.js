@@ -120,7 +120,7 @@ svg
   .attr("y", height - 5)
   .attr("text-anchor", "middle")
   .attr("font-size", 12)
-  .text("Number of offspring (subreddit members / digital seedlings)");
+  .text("Number of offspring/subreddit members");
 
 // "year" label in the corner
 const yearLabel = svg
