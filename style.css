@@ -26,9 +26,10 @@ h1 {
 }
 
 .bar-label {
-  font-size: 12px;
+  font-size: 11px;
   fill: #102010;
 }
+
 
 .value-label {
   font-size: 11px;
